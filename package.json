@@ -12,6 +12,8 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^6.1.5"
+    "astro": "^6.1.5",
+    "rehype-katex": "^7.0.1",
+    "remark-math": "^6.0.0"
   }
 }
