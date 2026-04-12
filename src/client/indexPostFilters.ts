@@ -39,7 +39,6 @@ export function initIndexPostFilters(): void {
     "post-search",
   ) as HTMLInputElement | null;
   const filterStatus = document.getElementById("filter-status");
-  const filterText = document.getElementById("filter-text");
   const filterClear = document.getElementById("filter-clear");
   const emptyFilter = document.getElementById("empty-filter");
   const emptyFilterClear = document.getElementById("empty-filter-clear");
@@ -156,25 +155,8 @@ export function initIndexPostFilters(): void {
 
     const hasFilter =
       Boolean(category) || tags.size > 0 || tokens.length > 0;
-    /** 顶栏「筛选：…」：搜索时不展示（仅分类 / 标签时展示） */
-    const showFilterStatusBar =
-      (Boolean(category) || tags.size > 0) && tokens.length === 0;
-    if (filterStatus) {
-      filterStatus.style.display = showFilterStatusBar ? "flex" : "none";
-      if (filterText && showFilterStatusBar) {
-        const parts: string[] = [];
-        if (category) {
-          const catBtn = document.querySelector(
-            `.cat-btn[data-cat="${CSS.escape(category)}"]`,
-          );
-          parts.push(catBtn?.textContent?.trim() || category);
-        }
-        if (tags.size > 0) {
-          parts.push([...tags].join(" + "));
-        }
-        filterText.textContent = `筛选：${parts.join(" → ")}（${matchTotal} 篇）`;
-      }
-    }
+    /** 顶栏「筛选：…」不展示；分类 / 标签仅靠侧栏与 URL 体现 */
+    if (filterStatus) filterStatus.style.display = "none";
 
     if (emptyFilter && postsList) {
       if (matchTotal === 0 && hasFilter) {
