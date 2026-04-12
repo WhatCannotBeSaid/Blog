@@ -20,12 +20,11 @@ const dateStr = post.data.date
     : null;
 ---
 
-<Layout title={post.data.title} comments>
+<Layout title={post.data.title} description={post.data.description} comments>
   <article class="prose">
     <header class="post-header">
       <h1>{post.data.title}</h1>
       {dateStr && <time>{dateStr}</time>}
-      {post.data.description && <p class="lead">{post.data.description}</p>}
     </header>
     <Content />
   </article>
@@ -89,12 +88,6 @@ const dateStr = post.data.date
     font-family: var(--title-font);
     font-size: 1.05rem;
     color: var(--ink-faint);
-  }
-
-  .lead {
-    margin-top: 0.75rem;
-    color: var(--ink-light);
-    font-size: 1.05rem;
   }
 
   .prose {

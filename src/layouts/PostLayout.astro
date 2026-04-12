@@ -3,12 +3,11 @@ import Layout from './Layout.astro';
 const { frontmatter } = Astro.props;
 ---
 
-<Layout title={frontmatter.title} comments>
+<Layout title={frontmatter.title} description={frontmatter.description} comments>
   <article class="prose">
     <header class="post-header">
       <h1>{frontmatter.title}</h1>
       {frontmatter.date && <time>{frontmatter.date}</time>}
-      {frontmatter.description && <p class="lead">{frontmatter.description}</p>}
     </header>
     <slot />
   </article>
@@ -27,12 +26,6 @@ const { frontmatter } = Astro.props;
     font-family: var(--title-font);
     font-size: 1.05rem;
     color: var(--ink-faint);
-  }
-
-  .lead {
-    margin-top: 0.75rem;
-    color: var(--ink-light);
-    font-size: 1.05rem;
   }
 
   .prose {
