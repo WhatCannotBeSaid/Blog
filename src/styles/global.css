@@ -1,0 +1,577 @@
+/* ===== 一页纸 (One Sheet of Paper) - 沉浸式终版 ===== */
+
+:root {
+  color-scheme: light;
+  /* 纸质色系 */
+  --bg-main: #fcfaf2;
+  --bg-gradient-edge: #f5f3eb;
+  --text-main: #2a2a2a;
+  --text-muted: #6b7280;
+  --accent: #c05621;
+  --accent-light: #fff5f2;
+  --ink: #2c2c2c;
+  --ink-light: #6b6b6b;
+  --ink-faint: #a0a0a0;
+  --seal: #b44a1e;
+  /* 交互与表面（与 seal 同色相，深浅随主题切换） */
+  --surface-hover: rgba(0, 0, 0, 0.04);
+  --accent-soft: rgba(176, 74, 30, 0.12);
+  --accent-soft-mid: rgba(176, 74, 30, 0.08);
+  --accent-soft-strong: rgba(176, 74, 30, 0.14);
+  --tag-muted-bg: rgba(0, 0, 0, 0.045);
+  --tag-muted-bg-mobile: rgba(0, 0, 0, 0.05);
+  --link-underline: rgba(176, 74, 30, 0.2);
+  --blockquote-bg: rgba(176, 74, 30, 0.06);
+  --inline-code-bg: rgba(0, 0, 0, 0.04);
+  --pre-bg: #faf8f5;
+  --code-block-border: rgba(176, 74, 30, 0.28);
+  --callout-bg: rgba(0, 0, 0, 0.028);
+  --focus-ring: rgba(176, 74, 30, 0.35);
+  --nav-pill-hover-bg: rgba(176, 74, 30, 0.12);
+  --nav-pill-shadow: rgba(176, 74, 30, 0.1);
+  --nav-focus-ring: rgba(176, 74, 30, 0.45);
+  --social-hover-bg: rgba(0, 0, 0, 0.05);
+  /* 正文衬线：你的 Lora 优先；无本机字时用 Source Serif 4（阅读向）+ Noto 中文 */
+  --serif:
+    "Lora",
+    "Source Serif 4",
+    "Noto Serif SC",
+    "Source Han Serif SC",
+    "SimSun",
+    Georgia,
+    serif;
+
+  /* 字体栈 */
+  --font-body: var(--serif);
+  /* UI：系统优先；无 Ideal/方正艺黑时用 Noto Sans SC + Source Sans 3 */
+  --font-ui:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Noto Sans SC",
+    "Source Sans 3",
+    "PingFang SC",
+    "Microsoft YaHei",
+    sans-serif;
+  --font-mono:
+    "Operator Mono",
+    "Cascadia Code",
+    "JetBrains Mono",
+    "LXGW Wenkai Mono Screen",
+    "LXGW Wenkai Mono",
+    monospace;
+  --margin-note-font:
+    "Cronos Pro",
+    "文悦莺黑 简繁 (需授权)",
+    "文悦莺黑简繁（需授权）",
+    "文悦莺黑 简繁（需授权）",
+    "文悦莺黑简繁",
+    "文悦莺黑",
+    "方正悠黑",
+    "Noto Sans SC",
+    "Source Sans 3",
+    "PingFang SC",
+    "Microsoft YaHei",
+    sans-serif;
+
+  /* 首页文章列表 */
+  --title-font:
+    "Domaine Display",
+    "Playfair Display",
+    "Cormorant Garamond",
+    "方正清刻本悦宋 简繁",
+    "Aa古典明朝楷 (非商业使用)",
+    "方正柳公权楷书",
+    "Source Serif 4",
+    "Noto Serif SC",
+    "Kaiti SC",
+    "STKaiti",
+    "华文楷体",
+    "KaiTi",
+    "楷体",
+    serif;
+  --heading-font:
+    "Tiempos Headline",
+    "Georgia",
+    "Aa古典明朝楷 (非商业使用)",
+    "方正清刻本悦宋 简繁",
+    "Aa古典明朝楷",
+    "Source Serif 4",
+    "Playfair Display",
+    "Noto Serif SC",
+    "Songti SC",
+    "STSong",
+    "华文宋体",
+    serif;
+  --article-body-font:
+    "Tiempos Text",
+    "Palatino Linotype",
+    "方正屏显雅宋_GBK",
+    "方正屏显雅宋",
+    "Lora",
+    "Source Serif 4",
+    "Noto Serif SC",
+    "Songti SC",
+    "STSong",
+    "华文宋体",
+    serif;
+  --blockquote-font:
+    "Calligraph421 Adjusted",
+    "Calligraph421 BT",
+    "文悦古典明朝体 简入繁出 (需授权)",
+    "文悦古典明朝体",
+    "Cormorant Garamond",
+    "Lora",
+    "Noto Serif SC",
+    "Kaiti SC",
+    "STKaiti",
+    "华文楷体",
+    "KaiTi",
+    "楷体",
+    serif;
+  --post-list-desc-font:
+    "Tiempos Text",
+    "Palatino Linotype",
+    "方正屏显雅宋_GBK",
+    "方正屏显雅宋",
+    "Lora",
+    "Source Serif 4",
+    "Noto Serif SC",
+    "Songti SC",
+    "STSong",
+    "华文宋体",
+    serif;
+
+  /* 顶栏引文与首页搜索框占位 */
+  --font-header-quote:
+    "Calligraph421 BT Roman",
+    "Calligraph421 BT",
+    "Calligraph421 Adjusted",
+    "Cormorant Garamond",
+    "Lora",
+    "Noto Serif SC",
+    Georgia,
+    serif;
+
+  /* 布局尺度 */
+  --content-width: 760px;
+  --margin-width: 200px;
+  /* 与 .page-grid padding-top 一致：避免「顶栏占位 + paper 整屏高」叠出多余滚动条 */
+  --page-grid-pad-top: 1.25rem;
+}
+
+/* 夜间：系统深色，且未强制 data-theme=light */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg-main: #1b1b1d;
+    --bg-gradient-edge: #131315;
+    --text-main: #e8e6e1;
+    --text-muted: #9aa0a8;
+    --accent: #e8915c;
+    --accent-light: rgba(232, 145, 92, 0.14);
+    --ink: #eceae5;
+    --ink-light: #b4b1a9;
+    --ink-faint: #85827a;
+    --seal: #e8834a;
+    --surface-hover: rgba(255, 255, 255, 0.06);
+    --accent-soft: rgba(232, 131, 74, 0.2);
+    --accent-soft-mid: rgba(232, 131, 74, 0.12);
+    --accent-soft-strong: rgba(232, 131, 74, 0.28);
+    --tag-muted-bg: rgba(255, 255, 255, 0.07);
+    --tag-muted-bg-mobile: rgba(255, 255, 255, 0.08);
+    --link-underline: rgba(232, 131, 74, 0.42);
+    --blockquote-bg: rgba(232, 131, 74, 0.12);
+    --inline-code-bg: rgba(255, 255, 255, 0.09);
+    --pre-bg: #242426;
+    --code-block-border: rgba(232, 131, 74, 0.38);
+    --callout-bg: rgba(255, 255, 255, 0.05);
+    --focus-ring: rgba(232, 131, 74, 0.45);
+    --nav-pill-hover-bg: rgba(232, 131, 74, 0.22);
+    --nav-pill-shadow: rgba(0, 0, 0, 0.4);
+    --nav-focus-ring: rgba(232, 145, 92, 0.55);
+    --social-hover-bg: rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* 预览 / 强制夜间：浅色系统下也可看效果（?theme=dark，见 Layout 内联脚本） */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-main: #1b1b1d;
+  --bg-gradient-edge: #131315;
+  --text-main: #e8e6e1;
+  --text-muted: #9aa0a8;
+  --accent: #e8915c;
+  --accent-light: rgba(232, 145, 92, 0.14);
+  --ink: #eceae5;
+  --ink-light: #b4b1a9;
+  --ink-faint: #85827a;
+  --seal: #e8834a;
+  --surface-hover: rgba(255, 255, 255, 0.06);
+  --accent-soft: rgba(232, 131, 74, 0.2);
+  --accent-soft-mid: rgba(232, 131, 74, 0.12);
+  --accent-soft-strong: rgba(232, 131, 74, 0.28);
+  --tag-muted-bg: rgba(255, 255, 255, 0.07);
+  --tag-muted-bg-mobile: rgba(255, 255, 255, 0.08);
+  --link-underline: rgba(232, 131, 74, 0.42);
+  --blockquote-bg: rgba(232, 131, 74, 0.12);
+  --inline-code-bg: rgba(255, 255, 255, 0.09);
+  --pre-bg: #242426;
+  --code-block-border: rgba(232, 131, 74, 0.38);
+  --callout-bg: rgba(255, 255, 255, 0.05);
+  --focus-ring: rgba(232, 131, 74, 0.45);
+  --nav-pill-hover-bg: rgba(232, 131, 74, 0.22);
+  --nav-pill-shadow: rgba(0, 0, 0, 0.4);
+  --nav-focus-ring: rgba(232, 145, 92, 0.55);
+  --social-hover-bg: rgba(255, 255, 255, 0.08);
+}
+
+/* 首页搜索：无框、居中；占位与正文均为实色，无流光 */
+#post-search {
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: var(--font-header-quote);
+  font-size: 1.22rem;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.45;
+  text-align: center;
+  border: none;
+  background-color: transparent;
+  caret-color: var(--seal);
+  color: var(--ink);
+}
+
+#post-search::-webkit-search-cancel-button,
+#post-search::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
+#post-search::placeholder,
+#post-search::-webkit-input-placeholder {
+  font-family: var(--font-header-quote);
+  font-size: 1.22rem;
+  font-weight: 400;
+  color: var(--ink-light);
+  opacity: 1;
+}
+
+#post-search::-moz-placeholder {
+  font-family: var(--font-header-quote);
+  font-size: 1.22rem;
+  font-weight: 400;
+  color: var(--ink-light);
+  opacity: 1;
+}
+
+@media (max-width: 720px) {
+  #post-search,
+  #post-search::placeholder,
+  #post-search::-webkit-input-placeholder,
+  #post-search::-moz-placeholder {
+    font-size: 1.05rem;
+  }
+}
+
+/* 文章页：顶栏标题 + 正文 Markdown 各级标题 */
+article.prose :where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--heading-font);
+}
+
+/* 文章页：正文段落、列表等（标题另用 --heading-font；code/pre 仍用全局等宽） */
+article.prose {
+  font-family: var(--article-body-font);
+}
+
+article.prose blockquote {
+  font-family: var(--blockquote-font);
+}
+
+/* ===== 基础重置 ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  line-height: 1.85;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== 类纸质环境色：侧边渐变向中心汇聚 ===== */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(
+    to right,
+    var(--bg-gradient-edge) 0%,
+    var(--bg-main) 15%,
+    var(--bg-main) 85%,
+    var(--bg-gradient-edge) 100%
+  );
+}
+
+/* ===== 阅读进度条 ===== */
+#reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(to right, var(--seal), var(--accent));
+  z-index: 200;
+  transition: width 0.1s linear;
+}
+
+/* ===== 三栏式布局 (留白 - 正文 - 旁注) ===== */
+.page-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr minmax(0, var(--content-width)) 1fr;
+  gap: 0;
+  padding-top: var(--page-grid-pad-top);
+}
+
+/* 正文主体 */
+.paper {
+  grid-column: 2;
+  padding: 1.5rem 2rem 5rem;
+  background: transparent;
+  min-height: calc(100vh - var(--page-grid-pad-top));
+}
+
+@supports (height: 100dvh) {
+  .paper {
+    min-height: calc(100dvh - var(--page-grid-pad-top));
+  }
+}
+
+/* 旁注：与正文引用区分——顶标短划、正体、偏淡；不用左侧整竖条 */
+.paper aside.margin-note {
+  float: right;
+  clear: right;
+  width: var(--margin-width);
+  margin-right: calc(-1 * var(--margin-width) - 2rem);
+  padding-left: 1.5rem;
+  padding-top: 0.55rem;
+  font-size: 0.82rem;
+  font-family: var(--margin-note-font);
+  font-style: normal;
+  font-weight: 400;
+  color: var(--ink-faint);
+  line-height: 1.5;
+  position: relative;
+  letter-spacing: 0.02em;
+}
+
+/* 中小屏幕下旁注变为内嵌块 */
+@media (max-width: 1200px) {
+  .paper aside.margin-note {
+    float: none;
+    width: 100%;
+    margin: 1rem 0;
+    padding: 0.7rem 1rem 0.85rem;
+    padding-top: 0.85rem;
+    background: var(--callout-bg);
+    border-radius: 6px;
+    border: none;
+    box-shadow: none;
+  }
+}
+
+/* ===== 链接 ===== */
+a {
+  color: var(--text-main);
+  text-decoration-line: underline;
+  text-decoration-color: var(--link-underline);
+  text-underline-offset: 3px;
+  transition: color 0.15s, text-decoration-color 0.15s;
+}
+
+a:hover {
+  color: var(--seal);
+  text-decoration-color: var(--seal);
+}
+
+/* ===== 排版 (Prose) ===== */
+h1, h2, h3 {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+h1 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+h2 { font-size: 1.3rem; margin-top: 2.5rem; margin-bottom: 0.75rem; }
+h3 { font-size: 1.1rem; margin-top: 2rem; margin-bottom: 0.5rem; }
+
+p {
+  margin-bottom: 1.25rem;
+}
+
+blockquote {
+  margin: 1.5rem 0;
+  padding: 0.65rem 1.15rem;
+  border-left: none;
+  background: var(--blockquote-bg);
+  border-radius: 8px;
+  color: var(--ink-light);
+  font-style: italic;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--inline-code-bg);
+  padding: 0.15em 0.35em;
+  border-radius: 3px;
+}
+
+pre {
+  background: var(--pre-bg);
+  padding: 1.25rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  border-radius: 4px;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+}
+
+/*
+ * Shiki：透明底 + 线框 + 行号。
+ * 行号：块级一行 + ::before 绝对定位（勿用 flex 包 token）。
+ * 关键：pre 默认 white-space: pre，会继承到 code，HTML 里「行与行之间的换行」会变成空白行，
+ * 行距被撑得极宽；code 用 normal 折叠行间空白，每行用 .line { white-space: pre } 保缩进。
+ */
+pre.astro-code {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 1px solid var(--code-block-border);
+  border-radius: 6px;
+  padding: 1rem 1rem 1rem 0.5rem;
+  margin: 1.5rem 0;
+  line-height: 1.45;
+  font-size: 0.88rem;
+  white-space: normal;
+}
+
+pre.astro-code code {
+  counter-reset: line 0;
+  display: block;
+  background: transparent !important;
+  background-color: transparent !important;
+  font-family: var(--font-mono);
+  font-size: inherit;
+  line-height: 1.45;
+  white-space: normal;
+}
+
+pre.astro-code .line {
+  display: block;
+  position: relative;
+  margin: 0;
+  padding-left: 4.75ch;
+  line-height: 1.45;
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+/* 空行仍有行号占位 */
+pre.astro-code .line:empty {
+  min-height: 1.45em;
+}
+
+pre.astro-code .line::before {
+  counter-increment: line;
+  content: counter(line);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4.25ch;
+  box-sizing: border-box;
+  padding-right: 0.65ch;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: inherit;
+  line-height: inherit;
+  color: var(--ink-faint);
+  opacity: 0.75;
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+/*
+ * Shiki 双主题：Astro 在 span 上同时写浅色 color 与 --shiki-dark，但不会自动切换。
+ * 透明 pre + 夜间页面底时若仍用浅色 color，标识符会像「消失」。夜间强制用 --shiki-dark。
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) pre.astro-code-themes {
+    color: var(--shiki-dark) !important;
+  }
+
+  :root:not([data-theme="light"]) pre.astro-code-themes span {
+    color: var(--shiki-dark) !important;
+  }
+}
+
+html[data-theme="dark"] pre.astro-code-themes {
+  color: var(--shiki-dark) !important;
+}
+
+html[data-theme="dark"] pre.astro-code-themes span {
+  color: var(--shiki-dark) !important;
+}
+
+/* KaTeX：避免行内公式被行高裁切；夜间与正文同色 */
+.katex {
+  font-size: 1.05em;
+  color: var(--text-main);
+}
+
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+hr { border: none; margin: 2.5rem 0; }
+
+img { max-width: 100%; border-radius: 2px; }
+
+ul, ol { padding-left: 1.5rem; margin-bottom: 1.25rem; }
+li { margin-bottom: 0.35rem; }
+
+/* ===== 响应式 ===== */
+@media (max-width: 900px) {
+  .page-grid {
+    grid-template-columns: 1fr;
+    padding-top: var(--page-grid-pad-top);
+  }
+  .paper {
+    grid-column: 1;
+    padding: 1.5rem 1.5rem 3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  html { font-size: 15px; }
+}

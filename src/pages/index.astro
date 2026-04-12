@@ -1,11 +1,661 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
+import SiteSocialLinks from "../components/SiteSocialLinks.astro";
+import CategoryIcon from "../components/CategoryIcon.astro";
+import type { CategorySlug } from "../components/CategoryIcon.astro";
+import { getCollection } from "astro:content";
+import { siteConfig } from "../site.config";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const allPosts = await getCollection("blog", ({ data }) => !data.draft);
+const posts = allPosts.sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
+);
+
+// 分类定义（保持与 content.config.ts enum 一致）
+const categories = [
+  { slug: "逻辑", label: "逻辑" },
+  { slug: "哲学", label: "哲学" },
+  { slug: "随笔", label: "随笔" },
+  { slug: "项目", label: "项目" },
+] as const satisfies readonly { slug: CategorySlug; label: string }[];
+
+// 只显示至少有一篇文章使用该 slug 的分类（无 category 的文章只跟「全部」）
+const usedCategories = categories.filter((cat) =>
+  posts.some((p) => p.data.category === cat.slug),
+);
+
+// 右侧标签云：频次 + 字号权重
+const tagCounts = new Map<string, number>();
+for (const post of posts) {
+  for (const raw of post.data.tags || []) {
+    const t = typeof raw === "string" ? raw.trim() : "";
+    if (!t) continue;
+    tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1);
+  }
+}
+const tagCloudEntries = [...tagCounts.entries()].sort(
+  (a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "zh"),
+);
+const tagCloudMin =
+  tagCloudEntries.length > 0
+    ? Math.min(...tagCloudEntries.map(([, c]) => c))
+    : 1;
+const tagCloudMax =
+  tagCloudEntries.length > 0
+    ? Math.max(...tagCloudEntries.map(([, c]) => c))
+    : 1;
+
+function tagCloudFontRem(count: number): number {
+  if (tagCloudMax === tagCloudMin) return 0.84;
+  const t = (count - tagCloudMin) / (tagCloudMax - tagCloudMin);
+  return 0.68 + t * 0.36;
+}
 ---
 
 <Layout>
-	<Welcome />
+  <!-- 左侧分类栏；站外链接紧贴分类下方 -->
+  <nav class="sidebar-left" id="category-bar" aria-label="文章分类">
+    <div class="sidebar-left__cats">
+      <button class="cat-btn active" data-cat="">
+        <CategoryIcon all />
+        全部
+      </button>
+      {
+        usedCategories.map((cat) => (
+          <button class="cat-btn" data-cat={cat.slug}>
+            <CategoryIcon slug={cat.slug} />
+            {cat.label}
+          </button>
+        ))
+      }
+    </div>
+    <SiteSocialLinks variant="sidebar" />
+  </nav>
+
+  <!-- 右侧：标签云 -->
+  <aside
+    class="sidebar-right"
+    id="tag-cloud-aside"
+    aria-label="文章标签"
+  >
+    {
+      tagCloudEntries.length > 0 && (
+        <div class="tag-cloud" id="tag-cloud">
+          {tagCloudEntries.map(([tag, count]) => (
+            <button
+              type="button"
+              class="tag-badge"
+              data-tag={tag}
+              style={`--tag-size: ${tagCloudFontRem(count)}rem`}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+      )
+    }
+  </aside>
+
+  <!-- 筛选状态提示 -->
+  <div class="filter-status" id="filter-status" style="display:none;">
+    <span id="filter-text"></span>
+    <button class="filter-clear" id="filter-clear">清除筛选</button>
+  </div>
+
+  <!-- 搜索 -->
+  <div class="post-search-wrap" id="post-search-wrap">
+    <input
+      type="search"
+      id="post-search"
+      name="q"
+      enterkeyhint="search"
+      autocomplete="off"
+      aria-label="搜索文章"
+      placeholder={siteConfig.headerQuote}
+    />
+  </div>
+
+  <!-- 文章列表 -->
+  <section class="posts" id="posts-list">
+    {
+      posts.length > 0 ? (
+        posts.map((post) => (
+          <article
+            class="post-row"
+            data-id={post.id}
+            data-category={post.data.category ?? ""}
+            data-tags={(post.data.tags || []).join(",")}
+            data-search={[
+              post.data.title || "",
+              post.data.description || "",
+              ...(post.data.tags || []),
+            ].join(" ")}
+          >
+            <div class="post-meta">
+              <time>
+                <span class="date-year">
+                  {new Date(post.data.date).getFullYear()}
+                </span>
+                <span class="date-md">
+                  {String(new Date(post.data.date).getMonth() + 1).padStart(
+                    2,
+                    "0",
+                  )}
+                  /{String(new Date(post.data.date).getDate()).padStart(2, "0")}
+                </span>
+              </time>
+              <span class="post-category-badge">
+                {post.data.category
+                  ? categories.find((c) => c.slug === post.data.category)?.label ??
+                    post.data.category
+                  : ""}
+              </span>
+            </div>
+            <div class="post-content">
+              <a href={`/posts/${post.id}`} class="post-title">
+                {post.data.title || "无题"}
+              </a>
+              {post.data.description && (
+                <p class="post-desc">{post.data.description}</p>
+              )}
+              {post.data.tags && post.data.tags.length > 0 && (
+                <div class="post-tags">
+                  {post.data.tags.map((tag) => (
+                    <span class="post-tag" data-tag-inline={tag}>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </article>
+        ))
+      ) : (
+        <p class="empty">尚无文章。</p>
+      )
+    }
+  </section>
+
+  <nav
+    class="post-pagination"
+    id="post-pagination"
+    aria-label="文章列表分页"
+    hidden
+  >
+    <button type="button" class="post-page-btn" id="post-page-prev">
+      上一页
+    </button>
+    <span class="post-page-indicator" id="post-page-indicator"></span>
+    <button type="button" class="post-page-btn" id="post-page-next">
+      下一页
+    </button>
+  </nav>
+
+  <!-- 空状态 -->
+  <div class="empty-filter" id="empty-filter" style="display:none;">
+    <p>没有匹配的文章。</p>
+    <button class="filter-clear" id="empty-filter-clear">清除筛选</button>
+  </div>
+
+  <script>
+    import { initIndexPostFilters } from "../client/indexPostFilters";
+
+    initIndexPostFilters();
+    document.addEventListener("astro:after-swap", initIndexPostFilters);
+  </script>
 </Layout>
+
+<style>
+  /* ===== 左侧分类栏 ===== */
+  .sidebar-left {
+    float: left;
+    clear: left;
+    width: var(--margin-width);
+    margin-left: calc(-1 * var(--margin-width) - 2rem);
+    padding-right: 1.5rem;
+    /* 与首篇文章标题行大致对齐：搜索区高度 + 首条上内边距 + 与标题字号的微调 */
+    padding-top: calc(
+      1.1rem + 0.7rem + 1.05rem * 1.45 + 1.15rem + 0.25rem
+    );
+    position: sticky;
+    top: calc(var(--page-grid-pad-top) + 0.5rem);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    align-self: start;
+  }
+
+  .sidebar-left__cats {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
+
+  .cat-btn {
+    font-family:
+      "Ideal Sans",
+      "方正艺黑简体",
+      "方正艺黑",
+      "Noto Sans SC",
+      "Source Sans 3",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      "PingFang SC",
+      "Microsoft YaHei",
+      sans-serif;
+    font-size: 0.95rem;
+    padding: 0.4rem 0.65rem;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    text-align: left;
+    width: fit-content;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .cat-btn:hover {
+    color: var(--seal);
+    background: var(--surface-hover);
+  }
+
+  .cat-btn.active {
+    color: var(--seal);
+    background: var(--accent-soft);
+    font-weight: 600;
+  }
+
+  /* ===== 右侧标签云 ===== */
+  .sidebar-right {
+    float: right;
+    clear: right;
+    width: var(--margin-width);
+    margin-right: calc(-1 * var(--margin-width) - 2rem);
+    padding-left: 1.5rem;
+    padding-top: calc(
+      1.1rem + 0.7rem + 1.05rem * 1.45 + 1.15rem + 0.25rem
+    );
+    position: sticky;
+    top: calc(var(--page-grid-pad-top) + 0.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    align-self: start;
+  }
+
+  .tag-cloud {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-end;
+    align-content: flex-start;
+    gap: 0.35rem 0.5rem;
+    width: 100%;
+  }
+
+  .tag-badge {
+    font-family:
+      "Ideal Sans",
+      "方正艺黑简体",
+      "方正艺黑",
+      "Noto Sans SC",
+      "Source Sans 3",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      "PingFang SC",
+      "Microsoft YaHei",
+      sans-serif;
+    font-size: var(--tag-size, 0.84rem);
+    line-height: 1.25;
+    color: var(--ink-light);
+    background: var(--tag-muted-bg);
+    padding: 0.2em 0.65em;
+    border: none;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition:
+      color 0.15s ease,
+      background 0.15s ease,
+      transform 0.12s ease;
+    text-align: center;
+    flex: 0 1 auto;
+    max-width: 100%;
+  }
+
+  .tag-badge:hover {
+    color: var(--seal);
+    background: var(--accent-soft-mid);
+    transform: translateY(-1px);
+  }
+
+  .tag-badge.active {
+    color: var(--seal);
+    font-weight: 600;
+    background: var(--accent-soft);
+  }
+
+  .tag-badge.hidden {
+    display: none;
+  }
+
+  /* ===== 筛选状态 ===== */
+  .filter-status {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    font-family: var(--font-ui);
+    font-size: 0.82rem;
+    color: var(--ink-light);
+  }
+
+  .filter-clear {
+    font-family: var(--font-ui);
+    font-size: 0.78rem;
+    color: var(--seal);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    padding: 0;
+  }
+
+  .filter-clear:hover {
+    opacity: 0.7;
+  }
+
+  .post-search-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.1rem;
+    font-family: var(--font-ui);
+  }
+
+  .post-search-wrap input[type="search"] {
+    width: min(42rem, 100%);
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 42rem;
+    padding: 0.35rem 0.75rem;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    outline: none;
+  }
+
+  .post-search-wrap input[type="search"]:focus {
+    outline: none;
+  }
+
+  .post-search-wrap input[type="search"]:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+
+  /* ===== 文章列表 ===== */
+  .posts {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .post-row {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 1.25rem;
+    align-items: baseline;
+    padding: 1.15rem 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .post-row.hidden {
+    display: none;
+  }
+
+  .post-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.25rem;
+    padding-top: 0.85rem;
+    font-family: var(--font-ui);
+    font-size: 0.82rem;
+    color: var(--ink-light);
+  }
+
+  .post-page-btn {
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+    color: var(--seal);
+    background: var(--accent-soft-mid);
+    border: none;
+    border-radius: 4px;
+    padding: 0.35rem 0.75rem;
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      opacity 0.15s ease;
+  }
+
+  .post-page-btn:hover:not(:disabled) {
+    background: var(--accent-soft-strong);
+  }
+
+  .post-page-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .post-page-indicator {
+    min-width: 9rem;
+    text-align: center;
+    letter-spacing: 0.02em;
+  }
+
+  .post-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  time {
+    font-family:
+      "Domaine Display",
+      "Playfair Display",
+      "Cormorant Garamond",
+      "Lora",
+      "Noto Serif SC",
+      Georgia,
+      serif;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.2;
+  }
+
+  .date-year {
+    font-size: 1.15rem;
+  }
+
+  .date-md {
+    font-size: 1.05rem;
+  }
+
+  .post-category-badge {
+    font-family:
+      "Domaine Display",
+      "Playfair Display",
+      "Cormorant Garamond",
+      "方正清刻本悦宋 简繁",
+      "Aa古典明朝楷 (非商业使用)",
+      "方正柳公权楷书",
+      "Source Serif 4",
+      "Noto Serif SC",
+      "Kaiti SC",
+      "STKaiti",
+      "华文楷体",
+      "KaiTi",
+      "楷体",
+      serif;
+    font-size: 1.2rem;
+    color: var(--ink);
+    padding: 0.1rem 0.45rem;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+    text-align: center;
+  }
+
+  .post-content {
+    min-width: 0;
+  }
+
+  .post-title {
+    font-family: var(--title-font);
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-decoration: none;
+    line-height: 1.4;
+  }
+
+  .post-title:hover {
+    color: var(--seal);
+  }
+
+  .post-desc {
+    font-family: var(--post-list-desc-font);
+    margin-top: 0.3rem;
+    margin-bottom: 0;
+    font-size: 0.92rem;
+    color: var(--ink);
+    line-height: 1.6;
+  }
+
+  .post-tags {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .post-tag {
+    font-family:
+      "文悦莺黑 简繁 (需授权)",
+      "文悦莺黑简繁（需授权）",
+      "文悦莺黑 简繁（需授权）",
+      "文悦莺黑简繁",
+      "文悦莺黑",
+      "WenYue YingHei JF",
+      "WenYue-YingHei-JF",
+      "Cronos Pro",
+      "方正悠黑",
+      "Noto Sans SC",
+      "Source Sans 3",
+      "PingFang SC",
+      "Microsoft YaHei",
+      sans-serif;
+    font-size: 0.82rem;
+    font-weight: 400;
+    color: var(--ink);
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .post-tag:hover {
+    color: var(--seal);
+  }
+
+  .empty {
+    color: var(--ink-faint);
+    font-style: italic;
+    padding: 2rem 0;
+  }
+
+  .empty-filter {
+    text-align: center;
+    padding: 3rem 0;
+    color: var(--ink-faint);
+    font-style: italic;
+  }
+
+  .empty-filter .filter-clear {
+    margin-top: 0.5rem;
+    display: inline-block;
+  }
+
+  /* ===== 响应式 ===== */
+  @media (max-width: 1200px) {
+    .sidebar-left,
+    .sidebar-right {
+      float: none;
+      width: 100%;
+      margin: 0 0 1.5rem 0;
+      padding: 0;
+      padding-top: 0;
+      position: static;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      min-height: 0;
+    }
+
+    .sidebar-left__cats {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      width: 100%;
+    }
+
+    .sidebar-left :global(.site-social--sidebar) {
+      margin-top: 0;
+      flex-basis: 100%;
+      width: 100%;
+      padding-top: 0;
+      justify-content: flex-start;
+    }
+
+    .cat-btn {
+      width: auto;
+      border: none;
+      border-radius: 20px;
+    }
+    .cat-btn.active {
+      border: none;
+    }
+    .tag-cloud {
+      justify-content: flex-start;
+    }
+    .tag-badge {
+      background: var(--tag-muted-bg-mobile);
+    }
+    .tag-badge.active {
+      background: var(--accent-soft-strong);
+    }
+  }
+
+  @media (max-width: 520px) {
+    .post-row {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+    .post-meta {
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+</style>

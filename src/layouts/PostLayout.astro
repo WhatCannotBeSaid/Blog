@@ -1,0 +1,55 @@
+---
+import Layout from './Layout.astro';
+const { frontmatter } = Astro.props;
+---
+
+<Layout title={frontmatter.title} comments>
+  <article class="prose">
+    <header class="post-header">
+      <h1>{frontmatter.title}</h1>
+      {frontmatter.date && <time>{frontmatter.date}</time>}
+      {frontmatter.description && <p class="lead">{frontmatter.description}</p>}
+    </header>
+    <slot />
+  </article>
+</Layout>
+
+<style>
+  .post-header {
+    margin-bottom: 0;
+  }
+
+  .post-header h1 {
+    margin-bottom: 0.5rem;
+  }
+
+  .post-header time {
+    font-family: var(--title-font);
+    font-size: 1.05rem;
+    color: var(--ink-faint);
+  }
+
+  .lead {
+    margin-top: 0.75rem;
+    color: var(--ink-light);
+    font-size: 1.05rem;
+  }
+
+  .prose {
+    /* 文章内容排版 */
+  }
+
+  .prose :global(h2) {
+    margin-top: 2.5rem;
+  }
+
+  .prose :global(h3) {
+    margin-top: 2rem;
+  }
+
+  /* KaTeX 公式间距 */
+  .prose :global(.katex-display) {
+    margin: 1.5rem 0;
+    overflow-x: auto;
+  }
+</style>

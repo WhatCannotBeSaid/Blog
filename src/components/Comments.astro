@@ -1,0 +1,77 @@
+---
+import { siteConfig } from "../site.config";
+
+const repo = siteConfig.utterancesRepo?.trim() ?? "";
+---
+
+<section
+  class="comments"
+  id="comments-root"
+  aria-label="评论"
+  data-utterances-repo={repo}
+>
+  <h2 class="comments-title">评论</h2>
+  {
+    !repo && (
+      <p class="comments-placeholder">
+        在 <code>src/site.config.ts</code> 中填写 <code>utterancesRepo</code>（格式
+        <code>用户名/仓库名</code>）并安装
+        <a href="https://github.com/apps/utterances">Utterances</a>
+        后即可在此讨论。
+      </p>
+    )
+  }
+  <script is:inline>
+    (function () {
+      const host = document.getElementById("comments-root");
+      if (!host) return;
+      const repo = host.getAttribute("data-utterances-repo")?.trim();
+      if (!repo) return;
+      const s = document.createElement("script");
+      s.src = "https://utteranc.es/client.js";
+      s.setAttribute("repo", repo);
+      s.setAttribute("issue-term", "pathname");
+      s.setAttribute("label", "comment");
+      const htmlEl = document.documentElement;
+      const forcedDark = htmlEl.getAttribute("data-theme") === "dark";
+      const forcedLight = htmlEl.getAttribute("data-theme") === "light";
+      const utterTheme =
+        forcedDark ||
+        (!forcedLight &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+          ? "github-dark"
+          : "github-light";
+      s.setAttribute("theme", utterTheme);
+      s.crossOrigin = "anonymous";
+      s.async = true;
+      host.appendChild(s);
+    })();
+  </script>
+</section>
+
+<style>
+  .comments {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    max-width: 100%;
+  }
+
+  .comments-title {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--ink);
+  }
+
+  .comments-placeholder {
+    font-family: var(--font-ui);
+    font-size: 0.9rem;
+    color: var(--ink-light);
+    line-height: 1.65;
+  }
+
+  .comments-placeholder code {
+    font-size: 0.85em;
+  }
+</style>

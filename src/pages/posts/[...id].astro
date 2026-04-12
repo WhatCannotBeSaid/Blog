@@ -1,0 +1,202 @@
+---
+// src/pages/posts/[...id].astro
+import { getCollection, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+
+export async function getStaticPaths() {
+    const posts = await getCollection("blog");
+    return posts.map((post) => ({
+        // 这里的 post.id 会自动包含子文件夹名，例如 "math/complex-analysis"
+        params: { id: post.id },
+        props: { post },
+    }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const dateStr = post.data.date
+    ? new Date(post.data.date).toISOString().slice(0, 10)
+    : null;
+---
+
+<Layout title={post.data.title} comments>
+  <article class="prose">
+    <header class="post-header">
+      <h1>{post.data.title}</h1>
+      {dateStr && <time>{dateStr}</time>}
+      {post.data.description && <p class="lead">{post.data.description}</p>}
+    </header>
+    <Content />
+  </article>
+
+  <nav class="post-end-nav" aria-label="文末快捷操作">
+    <a href="/" class="post-end-nav__btn" aria-label="返回主页">
+      <svg
+        class="post-end-nav__icon"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.75"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        vector-effect="non-scaling-stroke"
+        aria-hidden="true"
+      >
+        <path d="M5 12H3l9-9 9 9h-2"></path>
+        <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path>
+        <path d="M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6"></path>
+      </svg>
+    </a>
+    <button type="button" class="post-end-nav__btn" id="post-end-top" aria-label="返回顶部">
+      <svg
+        class="post-end-nav__icon post-end-nav__icon--top"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.75"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        vector-effect="non-scaling-stroke"
+        aria-hidden="true"
+      >
+        <path d="M12 18V6"></path>
+        <path d="M17 11l-5-5-5 5"></path>
+      </svg>
+    </button>
+  </nav>
+
+  <script>
+    import { initPostPageUI } from "../../client/postPageUI";
+
+    initPostPageUI();
+    document.addEventListener("astro:after-swap", initPostPageUI);
+  </script>
+</Layout>
+
+<style>
+  .post-header {
+    margin-bottom: 0;
+  }
+
+  .post-header h1 {
+    margin-bottom: 0.5rem;
+  }
+
+  .post-header time {
+    font-family: var(--title-font);
+    font-size: 1.05rem;
+    color: var(--ink-faint);
+  }
+
+  .lead {
+    margin-top: 0.75rem;
+    color: var(--ink-light);
+    font-size: 1.05rem;
+  }
+
+  .prose {
+    /* 文章内容排版 */
+  }
+
+  .prose :global(h2) {
+    margin-top: 2.5rem;
+  }
+
+  .prose :global(h3) {
+    margin-top: 2rem;
+  }
+
+  /* KaTeX 公式间距 */
+  .prose :global(.katex-display) {
+    margin: 1.5rem 0;
+    overflow-x: auto;
+  }
+
+  article.prose :global(h1, h2, h3, h4, h5, h6) {
+    cursor: pointer;
+  }
+
+  /* 紧贴评论区上方（DOM 在 Layout 中位于 #comments-root 之前） */
+  .post-end-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.85rem;
+    margin: 2.25rem 0 0;
+    padding: 0 0 0.25rem;
+  }
+
+  .post-end-nav__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.65rem;
+    height: 2.65rem;
+    padding: 0;
+    border-radius: 999px;
+    border: none;
+    background: transparent;
+    color: var(--seal);
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background 0.18s ease,
+      color 0.18s ease,
+      box-shadow 0.18s ease,
+      transform 0.18s ease;
+  }
+
+  .post-end-nav__btn:hover {
+    background: var(--nav-pill-hover-bg);
+    color: var(--accent);
+    box-shadow: 0 4px 18px var(--nav-pill-shadow);
+    transform: translateY(-2px);
+  }
+
+  .post-end-nav__btn:focus {
+    outline: none;
+  }
+
+  .post-end-nav__btn:focus-visible {
+    outline: 2px solid var(--nav-focus-ring);
+    outline-offset: 3px;
+  }
+
+  .post-end-nav__icon {
+    width: 1.35rem;
+    height: 1.35rem;
+    display: block;
+    flex-shrink: 0;
+    transition: transform 0.18s ease;
+  }
+
+  .post-end-nav__icon--top {
+    width: 1.7rem;
+    height: 1.7rem;
+  }
+
+  .post-end-nav__btn:hover .post-end-nav__icon {
+    transform: scale(1.08);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .post-end-nav__btn {
+      transition-duration: 0.01ms;
+    }
+
+    .post-end-nav__btn:hover {
+      transform: none;
+    }
+
+    .post-end-nav__icon {
+      transition-duration: 0.01ms;
+    }
+
+    .post-end-nav__btn:hover .post-end-nav__icon {
+      transform: none;
+    }
+  }
+</style>
