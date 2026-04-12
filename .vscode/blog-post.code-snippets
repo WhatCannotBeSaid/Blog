@@ -1,0 +1,19 @@
+{
+  "Blog 文章 frontmatter": {
+    "scope": "markdown",
+    "prefix": ["blogpost"],
+    "body": [
+      "---",
+      "title: ",
+      "date: ",
+      "description: ",
+      "category: 随笔",
+      "tags:",
+      "  - 未分类",
+      "draft: false",
+      "---",
+      ""
+    ],
+    "description": "插入与 content.config.ts 一致的 YAML（用于 src/content/blog）"
+  }
+}
