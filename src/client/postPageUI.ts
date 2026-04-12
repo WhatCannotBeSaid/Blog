@@ -1,4 +1,4 @@
-/** 文章页：标题点击回主页；文末「返回顶部」按钮 */
+/** 文章页：仅顶栏文章标题（.post-header h1）点击回主页；文末「返回顶部」按钮 */
 let postPageAbort: AbortController | null = null;
 
 function prefersReducedMotion(): boolean {
@@ -11,20 +11,14 @@ export function initPostPageUI(): void {
   const { signal } = postPageAbort;
 
   const article = document.querySelector("article.prose");
-  if (article) {
-    article.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((el) => {
-      el.setAttribute("title", "返回主页");
-    });
-
-    article.addEventListener(
+  const titleHeading = article?.querySelector(".post-header > h1");
+  if (titleHeading instanceof HTMLElement) {
+    titleHeading.setAttribute("title", "返回主页");
+    titleHeading.addEventListener(
       "click",
       (e) => {
-        const n = e.target;
-        const el = n instanceof Element ? n : n.parentElement;
-        if (!el) return;
-        if (el.closest("a, button")) return;
-        const heading = el.closest("h1, h2, h3, h4, h5, h6");
-        if (!heading || !article.contains(heading)) return;
+        const t = e.target;
+        if (t instanceof Element && t.closest("a, button")) return;
         window.location.href = "/";
       },
       { signal },

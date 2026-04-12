@@ -275,18 +275,125 @@ html[data-theme="dark"] {
   }
 }
 
-/* 文章页：顶栏标题 + 正文 Markdown 各级标题 */
-article.prose :where(h1, h2, h3, h4, h5, h6) {
+/* 文章页：文内 Markdown 标题 H2/H3（顶栏文章题见 .post-header h1） */
+article.prose :where(h2, h3) {
   font-family: var(--heading-font);
+  text-align: start;
+  line-height: 1.35;
+  font-weight: 600;
 }
 
-/* 文章页：正文段落、列表等（标题另用 --heading-font；code/pre 仍用全局等宽） */
+/*
+ * 文内一级标题 #：学术体 H1 三号（与顶栏文章题区分）
+ * 若文内仍有 ####+ 生成的 h4–h6，按 H3 样式呈现以兼容旧稿
+ */
+article.prose h1 {
+  font-family: var(--heading-font);
+  text-align: start;
+  line-height: 1.35;
+  font-weight: 600;
+  font-size: 1.333rem;
+}
+
+/* 顶栏文章题：展示向 --title-font，字号大于正文内 H1–H3 */
+article.prose .post-header h1 {
+  font-family: var(--title-font);
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1.28;
+  text-align: start;
+}
+
+article.prose .post-header {
+  text-align: start;
+}
+
+article.prose aside {
+  text-align: start;
+}
+
+/* 文章页：学术论文体例：正文 1.5 倍行距、两端对齐；无首行缩进，段间以固定段距区分 */
 article.prose {
   font-family: var(--article-body-font);
+  font-size: 1rem;
+  line-height: 1.5;
+  text-align: justify;
+}
+
+article.prose h2 {
+  font-size: 1.25rem;
+  margin-top: 2rem;
+  margin-bottom: 0.65rem;
+}
+
+article.prose h3 {
+  font-size: 1.1667rem;
+  margin-top: 1.6rem;
+  margin-bottom: 0.55rem;
+}
+
+article.prose :is(h4, h5, h6) {
+  font-family: var(--heading-font);
+  font-size: 1.1667rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-top: 1.6rem;
+  margin-bottom: 0.55rem;
+  text-align: start;
+}
+
+article.prose p {
+  margin-top: 0;
+  margin-bottom: 0.65em;
+  text-indent: 0;
+}
+
+article.prose :is(ul, ol) {
+  margin: 0.65em 0;
+  padding-left: 2em;
+  text-align: start;
+  list-style-position: outside;
+}
+
+article.prose li {
+  margin-bottom: 0.15em;
+}
+
+article.prose li > p {
+  margin-bottom: 0.35em;
+}
+
+article.prose li > p:last-child {
+  margin-bottom: 0;
 }
 
 article.prose blockquote {
   font-family: var(--blockquote-font);
+  margin: 1em 0;
+  text-align: start;
+}
+
+article.prose blockquote p {
+  margin-bottom: 0.55em;
+}
+
+article.prose blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+article.prose pre,
+article.prose .katex-display {
+  text-align: start;
+}
+
+article.prose p:has(> img:only-child) {
+  text-align: center;
+}
+
+article.prose p > img:only-child {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* ===== 基础重置 ===== */
@@ -553,7 +660,11 @@ html[data-theme="dark"] pre.astro-code-themes span {
   overflow-y: hidden;
 }
 
-hr { border: none; margin: 2.5rem 0; }
+hr {
+  border: none;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  margin: 2.5rem 0;
+}
 
 img { max-width: 100%; border-radius: 2px; }
 

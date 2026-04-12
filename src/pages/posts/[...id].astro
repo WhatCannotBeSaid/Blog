@@ -77,11 +77,17 @@ const dateStr = post.data.date
 
 <style>
   .post-header {
-    margin-bottom: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  /* 无日期时无「日期↔正文」可对齐，仍保留标题下留白 */
+  .post-header:not(:has(time)) {
+    margin-bottom: 2.5rem;
   }
 
   .post-header h1 {
     margin-bottom: 0.5rem;
+    cursor: pointer;
   }
 
   .post-header time {
@@ -94,22 +100,12 @@ const dateStr = post.data.date
     /* 文章内容排版 */
   }
 
-  .prose :global(h2) {
-    margin-top: 2.5rem;
-  }
-
-  .prose :global(h3) {
-    margin-top: 2rem;
-  }
+  /* 标题段距见 global.css article.prose（学术论文体例） */
 
   /* KaTeX 公式间距 */
   .prose :global(.katex-display) {
     margin: 1.5rem 0;
     overflow-x: auto;
-  }
-
-  article.prose :global(h1, h2, h3, h4, h5, h6) {
-    cursor: pointer;
   }
 
   /* 紧贴评论区上方（DOM 在 Layout 中位于 #comments-root 之前） */

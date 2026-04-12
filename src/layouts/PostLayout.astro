@@ -15,7 +15,11 @@ const { frontmatter } = Astro.props;
 
 <style>
   .post-header {
-    margin-bottom: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .post-header:not(:has(time)) {
+    margin-bottom: 2.5rem;
   }
 
   .post-header h1 {
@@ -32,13 +36,7 @@ const { frontmatter } = Astro.props;
     /* 文章内容排版 */
   }
 
-  .prose :global(h2) {
-    margin-top: 2.5rem;
-  }
-
-  .prose :global(h3) {
-    margin-top: 2rem;
-  }
+  /* 标题段距见 global.css article.prose（学术论文体例） */
 
   /* KaTeX 公式间距 */
   .prose :global(.katex-display) {
