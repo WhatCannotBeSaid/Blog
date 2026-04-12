@@ -7,13 +7,24 @@
       "title: ",
       "date: ",
       "description: ",
-      "category: 随笔",
+      "category: ",
       "tags:",
-      "  - 未分类",
+      "  - ",
       "draft: false",
       "---",
       ""
     ],
     "description": "插入与 content.config.ts 一致的 YAML（用于 src/content/blog）"
+  },
+  "Blog 侧边注 aside": {
+    "scope": "markdown",
+    "prefix": ["margin"],
+    "body": [
+      "<aside class=\"margin-note\">",
+      "  $1",
+      "</aside>",
+      ""
+    ],
+    "description": "插入 .paper aside.margin-note 旁注块（与 global.css 配套）"
   }
 }
