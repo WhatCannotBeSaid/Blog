@@ -3,8 +3,6 @@ title: 再见，Androgynous
 date: 2026-04-13
 description: 再见。
 category: 随笔
-tags:
-  - 
 draft: false
 ---
 # 初见
