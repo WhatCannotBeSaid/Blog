@@ -13,7 +13,7 @@ const blog = defineCollection({
     description: z.string().optional(),
     /** 可选；省略则仅出现在首页「全部」中，不记入任一具体分类侧栏 */
     category: categoryEnum.optional(),
-    tags: z.array(z.string()).min(1).max(5),
+    tags: z.array(z.string()).min(1).max(5).optional(),
     series: z.string().optional(),
     draft: z.boolean().default(false),
     updated: z.coerce.date().optional(),
