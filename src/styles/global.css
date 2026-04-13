@@ -227,11 +227,17 @@ html[data-theme="dark"] {
 }
 
 /* 首页搜索：无框、居中；占位与正文均为实色，无流光 */
+/* 单行 input 的 placeholder 不换行，窄屏按容器宽度缩小字号以显示整句 */
+.post-search-wrap {
+  container-type: inline-size;
+}
+
 #post-search {
   -webkit-appearance: none;
   appearance: none;
   font-family: var(--font-header-quote);
-  font-size: 1.22rem;
+  /* 无容器查询时按视口收缩；约 58 个拉丁字符需略小的 vw 系数 */
+  font-size: clamp(0.46rem, 0.2rem + 1.55vw, 1.22rem);
   font-weight: 400;
   font-style: normal;
   line-height: 1.45;
@@ -252,7 +258,7 @@ html[data-theme="dark"] {
 #post-search::placeholder,
 #post-search::-webkit-input-placeholder {
   font-family: var(--font-header-quote);
-  font-size: 1.22rem;
+  font-size: inherit;
   font-weight: 400;
   color: var(--ink-light);
   opacity: 1;
@@ -260,18 +266,22 @@ html[data-theme="dark"] {
 
 #post-search::-moz-placeholder {
   font-family: var(--font-header-quote);
-  font-size: 1.22rem;
+  font-size: inherit;
   font-weight: 400;
   color: var(--ink-light);
   opacity: 1;
 }
 
-@media (max-width: 720px) {
+/* 按搜索区实际宽度缩放（比纯 vw 更贴正文栏宽） */
+@container (min-width: 0) {
   #post-search,
   #post-search::placeholder,
   #post-search::-webkit-input-placeholder,
   #post-search::-moz-placeholder {
-    font-size: 1.05rem;
+    font-size: min(
+      1.22rem,
+      max(0.46rem, calc((100cqi - 2rem) / 35))
+    );
   }
 }
 
