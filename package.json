@@ -11,7 +11,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "favicon": "node scripts/generate-favicon.mjs",
-    "new-post": "node scripts/new-blog-post.mjs"
+    "new-post": "node scripts/new-blog-post.mjs",
+    "prepare": "husky"
   },
   "dependencies": {
     "astro": "^6.1.5",
@@ -19,6 +20,7 @@
     "remark-math": "^6.0.0"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
     "sharp": "^0.34.5",
     "to-ico": "^1.1.5"
   }
